@@ -1,5 +1,8 @@
 #Remove generated object files form the git repo.
-tmp
+build.gcc/tmp
 
 #Remove editor specific settings.
 .vscode
+
+#Remove generated test outputs added via: make test{:number:}
+du*.out

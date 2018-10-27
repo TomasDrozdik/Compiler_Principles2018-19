@@ -1,1 +1,31 @@
-No backing up.
+State #46 is non-accepting -
+ associated rule line numbers:
+	132
+ out-transitions: [ 0-9 ]
+ jam-transitions: EOF [ \000-/  :-\177 ]
+
+State #48 is non-accepting -
+ associated rule line numbers:
+	132
+ out-transitions: [ +  -  0-9 ]
+ jam-transitions: EOF [ \000-*  ,  .-/  :-\177 ]
+
+State #80 is non-accepting -
+ associated rule line numbers:
+	132
+ out-transitions: [ 0-9 ]
+ jam-transitions: EOF [ \000-/  :-\177 ]
+
+State #104 is non-accepting -
+ associated rule line numbers:
+	132
+ out-transitions: [ +  -  0-9 ]
+ jam-transitions: EOF [ \000-*  ,  .-/  :-\177 ]
+
+State #121 is non-accepting -
+ associated rule line numbers:
+	132
+ out-transitions: [ 0-9 ]
+ jam-transitions: EOF [ \000-/  :-\177 ]
+
+5 backing up (non-accepting) states.
