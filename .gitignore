@@ -1,4 +1,5 @@
-#Remove generated object files form the git repo
+#Remove generated object files form the git repo.
 tmp
 
-tmp/*
+#Remove editor specific settings.
+.vscode
