@@ -18,9 +18,31 @@
 #include "abstract_instr.hpp"
 #include "gen_ainstr.hpp"
 
+#ifndef _TUPLE
+#define _TUPLE
+#include <tuple>
+#endif
+
+#ifndef _CMATH
+#define _CMATH
+#include <cmath>
+#endif
+
+#ifndef _STRING
+#define _STRING
+#include <string>
+#endif
+
 namespace mlc {
 
+    std::tuple<int, bool>
+	try_parse_uint(char *str, std::size_t len);
 
+    double
+	try_parse_real(char *str, std::size_t len);
+
+	void
+    convert_to_upper(std::string &str);
 }
 
 #endif
