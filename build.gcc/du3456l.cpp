@@ -1,6 +1,6 @@
-#line 1 "du12l.cpp"
+#line 1 "du3456l.cpp"
 
-#line 3 "du12l.cpp"
+#line 3 "du3456l.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -386,14 +386,14 @@ static const flex_int16_t yy_nxt[][128] =
        50,   50,   50,   50,   50,   50,   50,   50,   50,   52,
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
-       50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
-       50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
-       50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
+       50,   50,   50,   50,   50,   50,   50,   50,   50,   53,
+       50,   50,   50,   53,   50,   50,   53,   50,   53,   50,
+       50,   50,   50,   50,   50,   50,   50,   53,   50,   50,
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
 
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
-       50,   50,   50,   50,   50,   50,   50,   50
+       50,   50,   50,   53,   50,   53,   50,   50
     },
 
     {
@@ -403,14 +403,14 @@ static const flex_int16_t yy_nxt[][128] =
        50,   50,   50,   50,   50,   50,   50,   50,   50,   52,
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
-       50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
-       50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
+       50,   50,   50,   50,   50,   50,   50,   50,   50,   53,
+       50,   50,   50,   53,   50,   50,   53,   50,   53,   50,
 
+       50,   50,   50,   50,   50,   50,   50,   53,   50,   50,
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
        50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
-       50,   50,   50,   50,   50,   50,   50,   50,   50,   50,
-       50,   50,   50,   50,   50,   50,   50,   50
+       50,   50,   50,   53,   50,   53,   50,   50
     },
 
     {
@@ -1194,36 +1194,36 @@ static const flex_int16_t yy_nxt[][128] =
 
     {
         7,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-      -50,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,  -50,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,  -50,
+       95,   95,   95,  -50,   95,   95,  -50,   95,  -50,   95,
+       95,   95,   95,   95,   95,   95,   95,  -50,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
 
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-       95,   95,   95,   95,   95,   95,   95,   95
+       95,   95,   95,  -50,   95,  -50,   95,   95
     },
 
     {
-        7,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
+        7,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,  -51,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,  -51,
 
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51,
-      -51,  -51,  -51,  -51,  -51,  -51,  -51,  -51
+       95,   95,   95,  -51,   95,   95,  -51,   95,  -51,   95,
+       95,   95,   95,   95,   95,   95,   95,  -51,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,  -51,   95,  -51,   95,   95
     },
 
     {
@@ -1972,19 +1972,19 @@ static const flex_int16_t yy_nxt[][128] =
 
     {
         7,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-      -95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,  -95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
 
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
+       95,   95,   95,   95,   95,   95,   95,   95,   95,  -95,
+       95,   95,   95,  -95,   95,   95,  -95,   95,  -95,   95,
+       95,   95,   95,   95,   95,   95,   95,  -95,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
        95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-       95,   95,   95,   95,   95,   95,   95,   95,   95,   95,
-       95,   95,   95,   95,   95,   95,   95,   95
+       95,   95,   95,  -95,   95,  -95,   95,   95
     },
 
     {
@@ -3415,8 +3415,8 @@ static const yy_state_type yy_NUL_trans[174] =
 #define yymore() yymore_used_but_not_detected
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
-#line 1 "../private-src/du12l.lex"
-#line 2 "../private-src/du12l.lex"
+#line 1 "../private-src/du3456l.lex"
+#line 2 "../private-src/du3456l.lex"
 	// this code is emitted into du12l.cpp
 	// avoid macro redefinition warnings when compiling du1l.cpp
 	#pragma warning (disable:4005)
@@ -3430,18 +3430,18 @@ static const yy_state_type yy_NUL_trans[174] =
 
 	// allow access to context
 	// CHANGE THIS LINE TO #include "du3456g.hpp" WHEN THIS FILE IS COPIED TO du3456l.lex
-	#include "dummyg.hpp"
+	#include "du3456g.hpp"
 
 
 	#include <cassert>
 
 	// add custom funcions for lexical analysis
-	#include "du12sem.hpp"
-#line 3440 "du12l.cpp"
+	#include "du3456sem.hpp"
+#line 3440 "du3456l.cpp"
 /* DO NOT TOUCH THIS OPTIONS! */
 #define YY_NO_INPUT 1
 
-#line 3444 "du12l.cpp"
+#line 3444 "du3456l.cpp"
 
 #define INITIAL 0
 #define STRING 1
@@ -3707,11 +3707,11 @@ YY_DECL
 		}
 
 	{
-#line 38 "../private-src/du12l.lex"
+#line 38 "../private-src/du3456l.lex"
 
 
 
-#line 42 "../private-src/du12l.lex"
+#line 42 "../private-src/du3456l.lex"
 	typedef yy::mlaskal_parser parser;
 
 	// add to count level of depth of inner comments
@@ -3721,7 +3721,7 @@ YY_DECL
 	std::string sub_string = "";
 
 
-#line 3724 "du12l.cpp"
+#line 3724 "du3456l.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -3768,7 +3768,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 51 "../private-src/du12l.lex"
+#line 51 "../private-src/du3456l.lex"
 {
 					BEGIN (STRING);
 					sub_string = "";
@@ -3776,7 +3776,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 56 "../private-src/du12l.lex"
+#line 56 "../private-src/du3456l.lex"
 {
 					BEGIN (COMMENT);
 					++comment_level;
@@ -3784,7 +3784,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 61 "../private-src/du12l.lex"
+#line 61 "../private-src/du3456l.lex"
 {
 					message (mlc::DUERR_UNEXPENDCMT, ctx->curline);
 				}
@@ -3792,7 +3792,7 @@ YY_RULE_SETUP
 
 case 4:
 YY_RULE_SETUP
-#line 66 "../private-src/du12l.lex"
+#line 66 "../private-src/du3456l.lex"
 {
 					BEGIN (INITIAL);
 					auto index = ctx->tab->ls_str().add(sub_string);
@@ -3801,7 +3801,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 72 "../private-src/du12l.lex"
+#line 72 "../private-src/du3456l.lex"
 {
 					sub_string += "'";
 				}
@@ -3809,7 +3809,7 @@ YY_RULE_SETUP
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 76 "../private-src/du12l.lex"
+#line 76 "../private-src/du3456l.lex"
 {
 					BEGIN (INITIAL);
 
@@ -3820,15 +3820,16 @@ YY_RULE_SETUP
 				}
 	YY_BREAK
 case YY_STATE_EOF(STRING):
-#line 85 "../private-src/du12l.lex"
+#line 85 "../private-src/du3456l.lex"
 {
 					message (mlc::DUERR_EOFINSTRCHR, ctx->curline);
 					return parser::make_EOF(ctx->curline);
 				}
 	YY_BREAK
 case 7:
+/* rule 7 can match eol */
 YY_RULE_SETUP
-#line 90 "../private-src/du12l.lex"
+#line 90 "../private-src/du3456l.lex"
 {
 					sub_string += yytext;
 				}
@@ -3837,14 +3838,14 @@ YY_RULE_SETUP
 
 case 8:
 YY_RULE_SETUP
-#line 96 "../private-src/du12l.lex"
+#line 96 "../private-src/du3456l.lex"
 {
 					++comment_level;
 				}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 100 "../private-src/du12l.lex"
+#line 100 "../private-src/du3456l.lex"
 {
 					if (--comment_level == 0) {
 						BEGIN (INITIAL);
@@ -3854,13 +3855,13 @@ YY_RULE_SETUP
 case 10:
 /* rule 10 can match eol */
 YY_RULE_SETUP
-#line 106 "../private-src/du12l.lex"
+#line 106 "../private-src/du3456l.lex"
 {
 					++ctx->curline;
 				}
 	YY_BREAK
 case YY_STATE_EOF(COMMENT):
-#line 110 "../private-src/du12l.lex"
+#line 110 "../private-src/du3456l.lex"
 {
 					message (mlc::DUERR_EOFINCMT, ctx->curline);
 					return parser::make_EOF(ctx->curline);
@@ -3868,174 +3869,174 @@ case YY_STATE_EOF(COMMENT):
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 115 "../private-src/du12l.lex"
+#line 115 "../private-src/du3456l.lex"
 /* eat cooments up */
 	YY_BREAK
 
 case 12:
 YY_RULE_SETUP
-#line 118 "../private-src/du12l.lex"
+#line 118 "../private-src/du3456l.lex"
 {
 					return parser::make_PROGRAM (ctx->curline);
 				}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 122 "../private-src/du12l.lex"
+#line 122 "../private-src/du3456l.lex"
 {
 					return parser::make_LABEL (ctx->curline);
 				}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 126 "../private-src/du12l.lex"
+#line 126 "../private-src/du3456l.lex"
 {
 					return parser::make_CONST (ctx->curline);
 				}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 130 "../private-src/du12l.lex"
+#line 130 "../private-src/du3456l.lex"
 {
 					return parser::make_TYPE (ctx->curline);
 				}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 134 "../private-src/du12l.lex"
+#line 134 "../private-src/du3456l.lex"
 {
 					return parser::make_VAR (ctx->curline);
 				}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 138 "../private-src/du12l.lex"
+#line 138 "../private-src/du3456l.lex"
 {
 					return parser::make_BEGIN (ctx->curline);
 				}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 142 "../private-src/du12l.lex"
+#line 142 "../private-src/du3456l.lex"
 {
 					return parser::make_END (ctx->curline);
 				}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 146 "../private-src/du12l.lex"
+#line 146 "../private-src/du3456l.lex"
 {
 					return parser::make_PROCEDURE (ctx->curline);
 				}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 150 "../private-src/du12l.lex"
+#line 150 "../private-src/du3456l.lex"
 {
 					return parser::make_FUNCTION (ctx->curline);
 				}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 154 "../private-src/du12l.lex"
+#line 154 "../private-src/du3456l.lex"
 {
 					return parser::make_ARRAY (ctx->curline);
 				}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 158 "../private-src/du12l.lex"
+#line 158 "../private-src/du3456l.lex"
 {
 					return parser::make_OF (ctx->curline);
 				}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 162 "../private-src/du12l.lex"
+#line 162 "../private-src/du3456l.lex"
 {
 					return parser::make_GOTO (ctx->curline);
 				}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 166 "../private-src/du12l.lex"
+#line 166 "../private-src/du3456l.lex"
 {
 					return parser::make_IF (ctx->curline);
 				}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 170 "../private-src/du12l.lex"
+#line 170 "../private-src/du3456l.lex"
 {
 					return parser::make_THEN (ctx->curline);
 				}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 174 "../private-src/du12l.lex"
+#line 174 "../private-src/du3456l.lex"
 {
 					return parser::make_ELSE (ctx->curline);
 				}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 178 "../private-src/du12l.lex"
+#line 178 "../private-src/du3456l.lex"
 {
 					return parser::make_WHILE (ctx->curline);
 				}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 182 "../private-src/du12l.lex"
+#line 182 "../private-src/du3456l.lex"
 {
 					return parser::make_DO (ctx->curline);
 				}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 186 "../private-src/du12l.lex"
+#line 186 "../private-src/du3456l.lex"
 {
 					return parser::make_REPEAT (ctx->curline);
 				}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 190 "../private-src/du12l.lex"
+#line 190 "../private-src/du3456l.lex"
 {
 					return parser::make_UNTIL (ctx->curline);
 				}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 194 "../private-src/du12l.lex"
+#line 194 "../private-src/du3456l.lex"
 {
 					return parser::make_FOR (ctx->curline);
 				}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 198 "../private-src/du12l.lex"
+#line 198 "../private-src/du3456l.lex"
 {
 					return parser::make_OR (ctx->curline);
 				}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 202 "../private-src/du12l.lex"
+#line 202 "../private-src/du3456l.lex"
 {
 					return parser::make_NOT (ctx->curline);
 				}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 206 "../private-src/du12l.lex"
+#line 206 "../private-src/du3456l.lex"
 {
 					return parser::make_RECORD (ctx->curline);
 				}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 210 "../private-src/du12l.lex"
+#line 210 "../private-src/du3456l.lex"
 {
 					std::tuple<int, bool> retval = mlc::try_parse_uint (yytext, yyleng);
 
@@ -4049,7 +4050,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 222 "../private-src/du12l.lex"
+#line 222 "../private-src/du3456l.lex"
 {
 					double retval = mlc::try_parse_real (yytext, yyleng);
 					if (retval == HUGE_VAL) {
@@ -4062,7 +4063,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 232 "../private-src/du12l.lex"
+#line 232 "../private-src/du3456l.lex"
 {
 					double retval = mlc::try_parse_real (yytext, yyleng);
 
@@ -4078,7 +4079,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 245 "../private-src/du12l.lex"
+#line 245 "../private-src/du3456l.lex"
 {
 					std::tuple<int, bool> retval = mlc::try_parse_uint (yytext, yyleng);
 
@@ -4094,182 +4095,182 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 259 "../private-src/du12l.lex"
+#line 259 "../private-src/du3456l.lex"
 {
 					return parser::make_SEMICOLON (ctx->curline);
 				}
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 263 "../private-src/du12l.lex"
+#line 263 "../private-src/du3456l.lex"
 {
 					return parser::make_DOT (ctx->curline);
 				}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 267 "../private-src/du12l.lex"
+#line 267 "../private-src/du3456l.lex"
 {
 					return parser::make_COMMA (ctx->curline);
 				}
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 271 "../private-src/du12l.lex"
+#line 271 "../private-src/du3456l.lex"
 {
 					return parser::make_EQ (ctx->curline);
 				}
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 275 "../private-src/du12l.lex"
+#line 275 "../private-src/du3456l.lex"
 {
 					return parser::make_COLON (ctx->curline);
 				}
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 279 "../private-src/du12l.lex"
+#line 279 "../private-src/du3456l.lex"
 {
 					return parser::make_LPAR (ctx->curline);
 				}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 283 "../private-src/du12l.lex"
+#line 283 "../private-src/du3456l.lex"
 {
 					return parser::make_RPAR (ctx->curline);
 				}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 287 "../private-src/du12l.lex"
+#line 287 "../private-src/du3456l.lex"
 {
 					return parser::make_DOTDOT (ctx->curline);
 				}
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 291 "../private-src/du12l.lex"
+#line 291 "../private-src/du3456l.lex"
 {
 					return parser::make_LSBRA (ctx->curline);
 				}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 295 "../private-src/du12l.lex"
+#line 295 "../private-src/du3456l.lex"
 {
 					return parser::make_RSBRA (ctx->curline);
 				}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 299 "../private-src/du12l.lex"
+#line 299 "../private-src/du3456l.lex"
 {
 					return parser::make_ASSIGN (ctx->curline);
 				}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 303 "../private-src/du12l.lex"
+#line 303 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_REL (mlc::DUTOKGE_OPER_REL::DUTOKGE_LT, ctx->curline);
 				}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 307 "../private-src/du12l.lex"
+#line 307 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_REL (mlc::DUTOKGE_OPER_REL::DUTOKGE_LE, ctx->curline);
 				}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 311 "../private-src/du12l.lex"
+#line 311 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_REL (mlc::DUTOKGE_OPER_REL::DUTOKGE_NE, ctx->curline);
 				}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 315 "../private-src/du12l.lex"
+#line 315 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_REL (mlc::DUTOKGE_OPER_REL::DUTOKGE_GE, ctx->curline);
 				}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 319 "../private-src/du12l.lex"
+#line 319 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_REL (mlc::DUTOKGE_OPER_REL::DUTOKGE_GT, ctx->curline);
 				}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 323 "../private-src/du12l.lex"
+#line 323 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_SIGNADD (mlc::DUTOKGE_OPER_SIGNADD::DUTOKGE_PLUS, ctx->curline);
 				}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 326 "../private-src/du12l.lex"
+#line 326 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_SIGNADD (mlc::DUTOKGE_OPER_SIGNADD::DUTOKGE_MINUS, ctx->curline);
 				}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 331 "../private-src/du12l.lex"
+#line 331 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_MUL (mlc::DUTOKGE_OPER_MUL::DUTOKGE_DIV, ctx->curline);
 				}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 336 "../private-src/du12l.lex"
+#line 336 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_MUL (mlc::DUTOKGE_OPER_MUL::DUTOKGE_MOD, ctx->curline);
 				}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 341 "../private-src/du12l.lex"
+#line 341 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_MUL (mlc::DUTOKGE_OPER_MUL::DUTOKGE_AND, ctx->curline);
 				}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 346 "../private-src/du12l.lex"
+#line 346 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_MUL (mlc::DUTOKGE_OPER_MUL::DUTOKGE_ASTERISK, ctx->curline);
 				}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 351 "../private-src/du12l.lex"
+#line 351 "../private-src/du3456l.lex"
 {
 					return parser::make_OPER_MUL (mlc::DUTOKGE_OPER_MUL::DUTOKGE_SOLIDUS, ctx->curline);
 				}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 355 "../private-src/du12l.lex"
+#line 355 "../private-src/du3456l.lex"
 {
 					return parser::make_FOR_DIRECTION (mlc::DUTOKGE_FOR_DIRECTION::DUTOKGE_TO, ctx->curline);
 				}
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 359 "../private-src/du12l.lex"
+#line 359 "../private-src/du3456l.lex"
 {
 					return parser::make_FOR_DIRECTION (mlc::DUTOKGE_FOR_DIRECTION::DUTOKGE_DOWNTO, ctx->curline);
 				}
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 363 "../private-src/du12l.lex"
+#line 363 "../private-src/du3456l.lex"
 {
 					std::string s = yytext;
 					mlc::convert_to_upper(s);
@@ -4279,32 +4280,32 @@ YY_RULE_SETUP
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 370 "../private-src/du12l.lex"
+#line 370 "../private-src/du3456l.lex"
 /* go out with whitespaces */
 	YY_BREAK
 case 66:
 /* rule 66 can match eol */
 YY_RULE_SETUP
-#line 372 "../private-src/du12l.lex"
+#line 372 "../private-src/du3456l.lex"
 {
 					++ctx->curline;
 				}
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 376 "../private-src/du12l.lex"
+#line 376 "../private-src/du3456l.lex"
 message (mlc::DUERR_UNKCHAR, ctx->curline, *yytext, *yytext);
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 378 "../private-src/du12l.lex"
+#line 378 "../private-src/du3456l.lex"
 return parser::make_EOF(ctx->curline);
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 380 "../private-src/du12l.lex"
+#line 380 "../private-src/du3456l.lex"
 ECHO;
 	YY_BREAK
-#line 4307 "du12l.cpp"
+#line 4308 "du3456l.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -5469,7 +5470,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 380 "../private-src/du12l.lex"
+#line 380 "../private-src/du3456l.lex"
 
 
 namespace mlc {

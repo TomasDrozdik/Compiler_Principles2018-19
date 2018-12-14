@@ -111,7 +111,7 @@ NEWLINE		\n
 					return parser::make_EOF(ctx->curline);
 				}
 
-	[^{}{NEWLINE}\0]+	/* eat cooments up */
+	[^\{\}\n\0]+	/* eat cooments up */
 }
 
 (?i:program) 	{

@@ -1,51 +1,174 @@
 Terminals unused in grammar
 
-   LABEL
-   CONST
-   TYPE
-   VAR
-   BEGIN
-   END
-   PROCEDURE
-   FUNCTION
-   ARRAY
-   OF
-   GOTO
-   IF
-   THEN
-   ELSE
-   WHILE
-   DO
-   REPEAT
-   UNTIL
-   FOR
-   OR
-   NOT
    RECORD
-   UINT
-   REAL
-   STRING
-   DOT
-   COMMA
-   EQ
-   COLON
-   LPAR
-   RPAR
-   DOTDOT
-   LSBRA
-   RSBRA
-   ASSIGN
-   OPER_REL
-   OPER_SIGNADD
-   OPER_MUL
-   FOR_DIRECTION
 
 
 Grammar
 
     0 $accept: mlaskal "end of file"
 
-    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON
+    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON blockP DOT
+
+    2 blockP: labelBlock constBlock typeBlock varBlock functionBlock statementsBlock
+
+    3 labelBlock: %empty
+    4           | LABEL UINT uintsLabels SEMICOLON
+
+    5 uintsLabels: %empty
+    6            | COMMA UINT uintsLabels
+
+    7 constBlock: %empty
+    8           | CONST constantDecl constantDecls
+
+    9 constantDecl: IDENTIFIER EQ UINT SEMICOLON
+   10             | IDENTIFIER EQ REAL SEMICOLON
+   11             | IDENTIFIER EQ STRING SEMICOLON
+   12             | IDENTIFIER EQ IDENTIFIER SEMICOLON
+   13             | IDENTIFIER EQ OPER_SIGNADD UINT SEMICOLON
+   14             | IDENTIFIER EQ OPER_SIGNADD REAL SEMICOLON
+
+   15 constantDecls: %empty
+   16              | constantDecl constantDecls
+
+   17 typeBlock: %empty
+   18          | TYPE typeDecl typeDecls
+
+   19 typeDecl: IDENTIFIER EQ type SEMICOLON
+
+   20 typeDecls: %empty
+   21          | typeDecl typeDecls
+
+   22 varBlock: %empty
+   23         | VAR varDecl varDecls
+
+   24 varDecl: IDENTIFIER identifiers COLON type SEMICOLON
+
+   25 identifiers: %empty
+   26            | COMMA IDENTIFIER identifiers
+
+   27 varDecls: %empty
+   28         | varDecl varDecls
+
+   29 functionBlock: %empty
+   30              | funcProcDecl funcProcDecls
+
+   31 $@1: %empty
+
+   32 funcProcDecl: funcProcHeader SEMICOLON $@1 block SEMICOLON
+
+   33 funcProcHeader: functionHeader
+   34               | procedureHeader
+
+   35 funcProcDecls: %empty
+   36              | funcProcDecl funcProcDecls
+
+   37 statementsBlock: %empty
+   38                | BEGIN statement statements END
+
+   39 statements: %empty
+   40           | SEMICOLON statement statements
+
+   41 block: labelBlock constBlock typeBlock varBlock BEGIN statement statements END
+
+   42 procedureHeader: PROCEDURE IDENTIFIER functionParameters
+
+   43 functionParameters: %empty
+   44                   | LPAR formalParameters RPAR
+
+   45 functionHeader: FUNCTION IDENTIFIER functionParameters COLON IDENTIFIER
+
+   46 formalParameters: VAR IDENTIFIER identifiers COLON IDENTIFIER formalParameterss
+   47                 | IDENTIFIER identifiers COLON IDENTIFIER formalParameterss
+
+   48 formalParameterss: %empty
+   49                  | SEMICOLON formalParameters
+
+   50 type: ordinalType
+   51     | arrayType
+   52     | IDENTIFIER
+
+   53 ordinalType: ordinalConstant DOTDOT ordinalConstant
+
+   54 arrayType: ARRAY LSBRA ordinalOrID ordinalOrIDs RSBRA OF type
+
+   55 ordinalOrID: IDENTIFIER
+   56            | ordinalType
+
+   57 ordinalOrIDs: %empty
+   58             | COMMA ordinalOrID ordinalOrIDs
+
+   59 statement: %empty
+   60          | UINT COLON matchedStmt
+   61          | matchedStmt
+   62          | UINT COLON unmatchedStmt
+   63          | unmatchedStmt
+
+   64 matchedStmt: assignment
+   65            | procedureStmt
+   66            | gotoStmt
+   67            | BEGIN statement statements END
+   68            | IF expression THEN matchedStmt ELSE matchedStmt
+   69            | WHILE expression DO matchedStmt
+   70            | repeatStmt
+   71            | FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+
+   72 unmatchedStmt: IF expression THEN statement
+   73              | IF expression THEN matchedStmt ELSE unmatchedStmt
+   74              | WHILE expression DO unmatchedStmt
+   75              | FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+
+   76 assignment: variable ASSIGN expression
+
+   77 procedureStmt: IDENTIFIER
+   78              | IDENTIFIER LPAR realParameters RPAR
+
+   79 gotoStmt: GOTO UINT
+
+   80 repeatStmt: REPEAT statement statements UNTIL expression
+
+   81 variable: IDENTIFIER
+   82         | arrayReference
+
+   83 arrayReference: variable LSBRA expression expressions RSBRA
+
+   84 expressions: %empty
+   85            | COMMA expression expressions
+
+   86 realParameters: expression
+   87               | expression COMMA realParameters
+
+   88 expression: simpleExpression relationalExpression
+
+   89 relationalExpression: %empty
+   90                     | OPER_REL simpleExpression
+   91                     | EQ simpleExpression
+
+   92 simpleExpression: OPER_SIGNADD term terms
+   93                 | term terms
+
+   94 term: factor factors
+
+   95 terms: %empty
+   96      | OPER_SIGNADD term terms
+   97      | OR term terms
+
+   98 factor: unsignedConstant
+   99       | variable
+  100       | IDENTIFIER LPAR realParameters RPAR
+  101       | LPAR expression RPAR
+  102       | NOT factor
+
+  103 factors: %empty
+  104        | OPER_MUL factor
+
+  105 unsignedConstant: UINT
+  106                 | REAL
+  107                 | STRING
+
+  108 ordinalConstant: OPER_SIGNADD IDENTIFIER
+  109                | IDENTIFIER
+  110                | OPER_SIGNADD UINT
+  111                | UINT
 
 
 Terminals, with rules where they appear
@@ -53,47 +176,48 @@ Terminals, with rules where they appear
 "end of file" (0) 0
 error (256)
 PROGRAM (258) 1
-LABEL (259)
-CONST (260)
-TYPE (261)
-VAR (262)
-BEGIN (263)
-END (264)
-PROCEDURE (265)
-FUNCTION (266)
-ARRAY (267)
-OF (268)
-GOTO (269)
-IF (270)
-THEN (271)
-ELSE (272)
-WHILE (273)
-DO (274)
-REPEAT (275)
-UNTIL (276)
-FOR (277)
-OR (278)
-NOT (279)
+LABEL (259) 4
+CONST (260) 8
+TYPE (261) 18
+VAR (262) 23 46
+BEGIN (263) 38 41 67
+END (264) 38 41 67
+PROCEDURE (265) 42
+FUNCTION (266) 45
+ARRAY (267) 54
+OF (268) 54
+GOTO (269) 79
+IF (270) 68 72 73
+THEN (271) 68 72 73
+ELSE (272) 68 73
+WHILE (273) 69 74
+DO (274) 69 71 74 75
+REPEAT (275) 80
+UNTIL (276) 80
+FOR (277) 71 75
+OR (278) 97
+NOT (279) 102
 RECORD (280)
-IDENTIFIER (281) 1
-UINT (282)
-REAL (283)
-STRING (284)
-SEMICOLON (285) 1
-DOT (286)
-COMMA (287)
-EQ (288)
-COLON (289)
-LPAR (290)
-RPAR (291)
-DOTDOT (292)
-LSBRA (293)
-RSBRA (294)
-ASSIGN (295)
-OPER_REL (296)
-OPER_SIGNADD (297)
-OPER_MUL (298)
-FOR_DIRECTION (299)
+IDENTIFIER <mlc::ls_id_index> (281) 1 9 10 11 12 13 14 19 24 26 42
+    45 46 47 52 55 71 75 77 78 81 100 108 109
+UINT <mlc::ls_int_index> (282) 4 6 9 13 60 62 79 105 110 111
+REAL <mlc::ls_real_index> (283) 10 14 106
+STRING <mlc::ls_str_index> (284) 11 107
+SEMICOLON (285) 1 4 9 10 11 12 13 14 19 24 32 40 49
+DOT (286) 1
+COMMA (287) 6 26 58 85 87
+EQ (288) 9 10 11 12 13 14 19 91
+COLON (289) 24 45 46 47 60 62
+LPAR (290) 44 78 100 101
+RPAR (291) 44 78 100 101
+DOTDOT (292) 53
+LSBRA (293) 54 83
+RSBRA (294) 54 83
+ASSIGN (295) 71 75 76
+OPER_REL <mlc::DUTOKGE_OPER_REL> (296) 90
+OPER_SIGNADD <mlc::DUTOKGE_OPER_SIGNADD> (297) 13 14 92 96 108 110
+OPER_MUL <mlc::DUTOKGE_OPER_MUL> (298) 104
+FOR_DIRECTION <mlc::DUTOKGE_FOR_DIRECTION> (299) 71 75
 
 
 Nonterminals, with rules where they appear
@@ -102,12 +226,114 @@ $accept (45)
     on left: 0
 mlaskal (46)
     on left: 1, on right: 0
+blockP (47)
+    on left: 2, on right: 1
+labelBlock (48)
+    on left: 3 4, on right: 2 41
+uintsLabels (49)
+    on left: 5 6, on right: 4 6
+constBlock (50)
+    on left: 7 8, on right: 2 41
+constantDecl (51)
+    on left: 9 10 11 12 13 14, on right: 8 16
+constantDecls (52)
+    on left: 15 16, on right: 8 16
+typeBlock (53)
+    on left: 17 18, on right: 2 41
+typeDecl (54)
+    on left: 19, on right: 18 21
+typeDecls (55)
+    on left: 20 21, on right: 18 21
+varBlock (56)
+    on left: 22 23, on right: 2 41
+varDecl (57)
+    on left: 24, on right: 23 28
+identifiers <std::deque<mlc::ls_id_index>> (58)
+    on left: 25 26, on right: 24 26 46 47
+varDecls (59)
+    on left: 27 28, on right: 23 28
+functionBlock (60)
+    on left: 29 30, on right: 2
+funcProcDecl (61)
+    on left: 32, on right: 30 36
+$@1 (62)
+    on left: 31, on right: 32
+funcProcHeader <mlc::ls_id_index> (63)
+    on left: 33 34, on right: 32
+funcProcDecls (64)
+    on left: 35 36, on right: 30 36
+statementsBlock (65)
+    on left: 37 38, on right: 2
+statements (66)
+    on left: 39 40, on right: 38 40 41 67 80
+block (67)
+    on left: 41, on right: 32
+procedureHeader <mlc::ls_id_index> (68)
+    on left: 42, on right: 34
+functionParameters <mlc::parameter_list_ptr> (69)
+    on left: 43 44, on right: 42 45
+functionHeader <mlc::ls_id_index> (70)
+    on left: 45, on right: 33
+formalParameters <mlc::parameter_list_ptr> (71)
+    on left: 46 47, on right: 44 49
+formalParameterss <mlc::parameter_list_ptr> (72)
+    on left: 48 49, on right: 46 47
+type <mlc::type_pointer> (73)
+    on left: 50 51 52, on right: 19 24 54
+ordinalType <mlc::type_pointer> (74)
+    on left: 53, on right: 50 56
+arrayType <mlc::type_pointer> (75)
+    on left: 54, on right: 51
+ordinalOrID <mlc::type_pointer> (76)
+    on left: 55 56, on right: 54 58
+ordinalOrIDs <std::deque<mlc::type_pointer>> (77)
+    on left: 57 58, on right: 54 58
+statement (78)
+    on left: 59 60 61 62 63, on right: 38 40 41 67 72 80
+matchedStmt (79)
+    on left: 64 65 66 67 68 69 70 71, on right: 60 61 68 69 71 73
+unmatchedStmt (80)
+    on left: 72 73 74 75, on right: 62 63 73 74 75
+assignment (81)
+    on left: 76, on right: 64
+procedureStmt (82)
+    on left: 77 78, on right: 65
+gotoStmt (83)
+    on left: 79, on right: 66
+repeatStmt (84)
+    on left: 80, on right: 70
+variable (85)
+    on left: 81 82, on right: 76 83 99
+arrayReference (86)
+    on left: 83, on right: 82
+expressions (87)
+    on left: 84 85, on right: 83 85
+realParameters (88)
+    on left: 86 87, on right: 78 87 100
+expression (89)
+    on left: 88, on right: 68 69 71 72 73 74 75 76 80 83 85 86 87 101
+relationalExpression (90)
+    on left: 89 90 91, on right: 88
+simpleExpression (91)
+    on left: 92 93, on right: 88 90 91
+term (92)
+    on left: 94, on right: 92 93 96 97
+terms (93)
+    on left: 95 96 97, on right: 92 93 96 97
+factor (94)
+    on left: 98 99 100 101 102, on right: 94 102 104
+factors (95)
+    on left: 103 104, on right: 94
+unsignedConstant (96)
+    on left: 105 106 107, on right: 98
+ordinalConstant <mlc::ls_int_index> (97)
+    on left: 108 109 110 111, on right: 53
 
 
 State 0
 
     0 $accept: . mlaskal "end of file"
-    1 mlaskal: . PROGRAM IDENTIFIER SEMICOLON
+    1 mlaskal: . PROGRAM IDENTIFIER SEMICOLON blockP DOT
 
     PROGRAM  shift, and go to state 1
 
@@ -116,7 +342,7 @@ State 0
 
 State 1
 
-    1 mlaskal: PROGRAM . IDENTIFIER SEMICOLON
+    1 mlaskal: PROGRAM . IDENTIFIER SEMICOLON blockP DOT
 
     IDENTIFIER  shift, and go to state 3
 
@@ -130,7 +356,7 @@ State 2
 
 State 3
 
-    1 mlaskal: PROGRAM IDENTIFIER . SEMICOLON
+    1 mlaskal: PROGRAM IDENTIFIER . SEMICOLON blockP DOT
 
     SEMICOLON  shift, and go to state 5
 
@@ -144,6 +370,3012 @@ State 4
 
 State 5
 
-    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON .
+    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON . blockP DOT
+    2 blockP: . labelBlock constBlock typeBlock varBlock functionBlock statementsBlock
+    3 labelBlock: . %empty  [CONST, TYPE, VAR, BEGIN, PROCEDURE, FUNCTION, DOT]
+    4           | . LABEL UINT uintsLabels SEMICOLON
+
+    LABEL  shift, and go to state 6
+
+    $default  reduce using rule 3 (labelBlock)
+
+    blockP      go to state 7
+    labelBlock  go to state 8
+
+
+State 6
+
+    4 labelBlock: LABEL . UINT uintsLabels SEMICOLON
+
+    UINT  shift, and go to state 9
+
+
+State 7
+
+    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON blockP . DOT
+
+    DOT  shift, and go to state 10
+
+
+State 8
+
+    2 blockP: labelBlock . constBlock typeBlock varBlock functionBlock statementsBlock
+    7 constBlock: . %empty  [TYPE, VAR, BEGIN, PROCEDURE, FUNCTION, DOT]
+    8           | . CONST constantDecl constantDecls
+
+    CONST  shift, and go to state 11
+
+    $default  reduce using rule 7 (constBlock)
+
+    constBlock  go to state 12
+
+
+State 9
+
+    4 labelBlock: LABEL UINT . uintsLabels SEMICOLON
+    5 uintsLabels: . %empty  [SEMICOLON]
+    6            | . COMMA UINT uintsLabels
+
+    COMMA  shift, and go to state 13
+
+    $default  reduce using rule 5 (uintsLabels)
+
+    uintsLabels  go to state 14
+
+
+State 10
+
+    1 mlaskal: PROGRAM IDENTIFIER SEMICOLON blockP DOT .
 
     $default  reduce using rule 1 (mlaskal)
+
+
+State 11
+
+    8 constBlock: CONST . constantDecl constantDecls
+    9 constantDecl: . IDENTIFIER EQ UINT SEMICOLON
+   10             | . IDENTIFIER EQ REAL SEMICOLON
+   11             | . IDENTIFIER EQ STRING SEMICOLON
+   12             | . IDENTIFIER EQ IDENTIFIER SEMICOLON
+   13             | . IDENTIFIER EQ OPER_SIGNADD UINT SEMICOLON
+   14             | . IDENTIFIER EQ OPER_SIGNADD REAL SEMICOLON
+
+    IDENTIFIER  shift, and go to state 15
+
+    constantDecl  go to state 16
+
+
+State 12
+
+    2 blockP: labelBlock constBlock . typeBlock varBlock functionBlock statementsBlock
+   17 typeBlock: . %empty  [VAR, BEGIN, PROCEDURE, FUNCTION, DOT]
+   18          | . TYPE typeDecl typeDecls
+
+    TYPE  shift, and go to state 17
+
+    $default  reduce using rule 17 (typeBlock)
+
+    typeBlock  go to state 18
+
+
+State 13
+
+    6 uintsLabels: COMMA . UINT uintsLabels
+
+    UINT  shift, and go to state 19
+
+
+State 14
+
+    4 labelBlock: LABEL UINT uintsLabels . SEMICOLON
+
+    SEMICOLON  shift, and go to state 20
+
+
+State 15
+
+    9 constantDecl: IDENTIFIER . EQ UINT SEMICOLON
+   10             | IDENTIFIER . EQ REAL SEMICOLON
+   11             | IDENTIFIER . EQ STRING SEMICOLON
+   12             | IDENTIFIER . EQ IDENTIFIER SEMICOLON
+   13             | IDENTIFIER . EQ OPER_SIGNADD UINT SEMICOLON
+   14             | IDENTIFIER . EQ OPER_SIGNADD REAL SEMICOLON
+
+    EQ  shift, and go to state 21
+
+
+State 16
+
+    8 constBlock: CONST constantDecl . constantDecls
+    9 constantDecl: . IDENTIFIER EQ UINT SEMICOLON
+   10             | . IDENTIFIER EQ REAL SEMICOLON
+   11             | . IDENTIFIER EQ STRING SEMICOLON
+   12             | . IDENTIFIER EQ IDENTIFIER SEMICOLON
+   13             | . IDENTIFIER EQ OPER_SIGNADD UINT SEMICOLON
+   14             | . IDENTIFIER EQ OPER_SIGNADD REAL SEMICOLON
+   15 constantDecls: . %empty  [TYPE, VAR, BEGIN, PROCEDURE, FUNCTION, DOT]
+   16              | . constantDecl constantDecls
+
+    IDENTIFIER  shift, and go to state 15
+
+    $default  reduce using rule 15 (constantDecls)
+
+    constantDecl   go to state 22
+    constantDecls  go to state 23
+
+
+State 17
+
+   18 typeBlock: TYPE . typeDecl typeDecls
+   19 typeDecl: . IDENTIFIER EQ type SEMICOLON
+
+    IDENTIFIER  shift, and go to state 24
+
+    typeDecl  go to state 25
+
+
+State 18
+
+    2 blockP: labelBlock constBlock typeBlock . varBlock functionBlock statementsBlock
+   22 varBlock: . %empty  [BEGIN, PROCEDURE, FUNCTION, DOT]
+   23         | . VAR varDecl varDecls
+
+    VAR  shift, and go to state 26
+
+    $default  reduce using rule 22 (varBlock)
+
+    varBlock  go to state 27
+
+
+State 19
+
+    5 uintsLabels: . %empty  [SEMICOLON]
+    6            | . COMMA UINT uintsLabels
+    6            | COMMA UINT . uintsLabels
+
+    COMMA  shift, and go to state 13
+
+    $default  reduce using rule 5 (uintsLabels)
+
+    uintsLabels  go to state 28
+
+
+State 20
+
+    4 labelBlock: LABEL UINT uintsLabels SEMICOLON .
+
+    $default  reduce using rule 4 (labelBlock)
+
+
+State 21
+
+    9 constantDecl: IDENTIFIER EQ . UINT SEMICOLON
+   10             | IDENTIFIER EQ . REAL SEMICOLON
+   11             | IDENTIFIER EQ . STRING SEMICOLON
+   12             | IDENTIFIER EQ . IDENTIFIER SEMICOLON
+   13             | IDENTIFIER EQ . OPER_SIGNADD UINT SEMICOLON
+   14             | IDENTIFIER EQ . OPER_SIGNADD REAL SEMICOLON
+
+    IDENTIFIER    shift, and go to state 29
+    UINT          shift, and go to state 30
+    REAL          shift, and go to state 31
+    STRING        shift, and go to state 32
+    OPER_SIGNADD  shift, and go to state 33
+
+
+State 22
+
+    9 constantDecl: . IDENTIFIER EQ UINT SEMICOLON
+   10             | . IDENTIFIER EQ REAL SEMICOLON
+   11             | . IDENTIFIER EQ STRING SEMICOLON
+   12             | . IDENTIFIER EQ IDENTIFIER SEMICOLON
+   13             | . IDENTIFIER EQ OPER_SIGNADD UINT SEMICOLON
+   14             | . IDENTIFIER EQ OPER_SIGNADD REAL SEMICOLON
+   15 constantDecls: . %empty  [TYPE, VAR, BEGIN, PROCEDURE, FUNCTION, DOT]
+   16              | . constantDecl constantDecls
+   16              | constantDecl . constantDecls
+
+    IDENTIFIER  shift, and go to state 15
+
+    $default  reduce using rule 15 (constantDecls)
+
+    constantDecl   go to state 22
+    constantDecls  go to state 34
+
+
+State 23
+
+    8 constBlock: CONST constantDecl constantDecls .
+
+    $default  reduce using rule 8 (constBlock)
+
+
+State 24
+
+   19 typeDecl: IDENTIFIER . EQ type SEMICOLON
+
+    EQ  shift, and go to state 35
+
+
+State 25
+
+   18 typeBlock: TYPE typeDecl . typeDecls
+   19 typeDecl: . IDENTIFIER EQ type SEMICOLON
+   20 typeDecls: . %empty  [VAR, BEGIN, PROCEDURE, FUNCTION, DOT]
+   21          | . typeDecl typeDecls
+
+    IDENTIFIER  shift, and go to state 24
+
+    $default  reduce using rule 20 (typeDecls)
+
+    typeDecl   go to state 36
+    typeDecls  go to state 37
+
+
+State 26
+
+   23 varBlock: VAR . varDecl varDecls
+   24 varDecl: . IDENTIFIER identifiers COLON type SEMICOLON
+
+    IDENTIFIER  shift, and go to state 38
+
+    varDecl  go to state 39
+
+
+State 27
+
+    2 blockP: labelBlock constBlock typeBlock varBlock . functionBlock statementsBlock
+   29 functionBlock: . %empty  [BEGIN, DOT]
+   30              | . funcProcDecl funcProcDecls
+   32 funcProcDecl: . funcProcHeader SEMICOLON $@1 block SEMICOLON
+   33 funcProcHeader: . functionHeader
+   34               | . procedureHeader
+   42 procedureHeader: . PROCEDURE IDENTIFIER functionParameters
+   45 functionHeader: . FUNCTION IDENTIFIER functionParameters COLON IDENTIFIER
+
+    PROCEDURE  shift, and go to state 40
+    FUNCTION   shift, and go to state 41
+
+    $default  reduce using rule 29 (functionBlock)
+
+    functionBlock    go to state 42
+    funcProcDecl     go to state 43
+    funcProcHeader   go to state 44
+    procedureHeader  go to state 45
+    functionHeader   go to state 46
+
+
+State 28
+
+    6 uintsLabels: COMMA UINT uintsLabels .
+
+    $default  reduce using rule 6 (uintsLabels)
+
+
+State 29
+
+   12 constantDecl: IDENTIFIER EQ IDENTIFIER . SEMICOLON
+
+    SEMICOLON  shift, and go to state 47
+
+
+State 30
+
+    9 constantDecl: IDENTIFIER EQ UINT . SEMICOLON
+
+    SEMICOLON  shift, and go to state 48
+
+
+State 31
+
+   10 constantDecl: IDENTIFIER EQ REAL . SEMICOLON
+
+    SEMICOLON  shift, and go to state 49
+
+
+State 32
+
+   11 constantDecl: IDENTIFIER EQ STRING . SEMICOLON
+
+    SEMICOLON  shift, and go to state 50
+
+
+State 33
+
+   13 constantDecl: IDENTIFIER EQ OPER_SIGNADD . UINT SEMICOLON
+   14             | IDENTIFIER EQ OPER_SIGNADD . REAL SEMICOLON
+
+    UINT  shift, and go to state 51
+    REAL  shift, and go to state 52
+
+
+State 34
+
+   16 constantDecls: constantDecl constantDecls .
+
+    $default  reduce using rule 16 (constantDecls)
+
+
+State 35
+
+   19 typeDecl: IDENTIFIER EQ . type SEMICOLON
+   50 type: . ordinalType
+   51     | . arrayType
+   52     | . IDENTIFIER
+   53 ordinalType: . ordinalConstant DOTDOT ordinalConstant
+   54 arrayType: . ARRAY LSBRA ordinalOrID ordinalOrIDs RSBRA OF type
+  108 ordinalConstant: . OPER_SIGNADD IDENTIFIER
+  109                | . IDENTIFIER
+  110                | . OPER_SIGNADD UINT
+  111                | . UINT
+
+    ARRAY         shift, and go to state 53
+    IDENTIFIER    shift, and go to state 54
+    UINT          shift, and go to state 55
+    OPER_SIGNADD  shift, and go to state 56
+
+    type             go to state 57
+    ordinalType      go to state 58
+    arrayType        go to state 59
+    ordinalConstant  go to state 60
+
+
+State 36
+
+   19 typeDecl: . IDENTIFIER EQ type SEMICOLON
+   20 typeDecls: . %empty  [VAR, BEGIN, PROCEDURE, FUNCTION, DOT]
+   21          | . typeDecl typeDecls
+   21          | typeDecl . typeDecls
+
+    IDENTIFIER  shift, and go to state 24
+
+    $default  reduce using rule 20 (typeDecls)
+
+    typeDecl   go to state 36
+    typeDecls  go to state 61
+
+
+State 37
+
+   18 typeBlock: TYPE typeDecl typeDecls .
+
+    $default  reduce using rule 18 (typeBlock)
+
+
+State 38
+
+   24 varDecl: IDENTIFIER . identifiers COLON type SEMICOLON
+   25 identifiers: . %empty  [COLON]
+   26            | . COMMA IDENTIFIER identifiers
+
+    COMMA  shift, and go to state 62
+
+    $default  reduce using rule 25 (identifiers)
+
+    identifiers  go to state 63
+
+
+State 39
+
+   23 varBlock: VAR varDecl . varDecls
+   24 varDecl: . IDENTIFIER identifiers COLON type SEMICOLON
+   27 varDecls: . %empty  [BEGIN, PROCEDURE, FUNCTION, DOT]
+   28         | . varDecl varDecls
+
+    IDENTIFIER  shift, and go to state 38
+
+    $default  reduce using rule 27 (varDecls)
+
+    varDecl   go to state 64
+    varDecls  go to state 65
+
+
+State 40
+
+   42 procedureHeader: PROCEDURE . IDENTIFIER functionParameters
+
+    IDENTIFIER  shift, and go to state 66
+
+
+State 41
+
+   45 functionHeader: FUNCTION . IDENTIFIER functionParameters COLON IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 67
+
+
+State 42
+
+    2 blockP: labelBlock constBlock typeBlock varBlock functionBlock . statementsBlock
+   37 statementsBlock: . %empty  [DOT]
+   38                | . BEGIN statement statements END
+
+    BEGIN  shift, and go to state 68
+
+    $default  reduce using rule 37 (statementsBlock)
+
+    statementsBlock  go to state 69
+
+
+State 43
+
+   30 functionBlock: funcProcDecl . funcProcDecls
+   32 funcProcDecl: . funcProcHeader SEMICOLON $@1 block SEMICOLON
+   33 funcProcHeader: . functionHeader
+   34               | . procedureHeader
+   35 funcProcDecls: . %empty  [BEGIN, DOT]
+   36              | . funcProcDecl funcProcDecls
+   42 procedureHeader: . PROCEDURE IDENTIFIER functionParameters
+   45 functionHeader: . FUNCTION IDENTIFIER functionParameters COLON IDENTIFIER
+
+    PROCEDURE  shift, and go to state 40
+    FUNCTION   shift, and go to state 41
+
+    $default  reduce using rule 35 (funcProcDecls)
+
+    funcProcDecl     go to state 70
+    funcProcHeader   go to state 44
+    funcProcDecls    go to state 71
+    procedureHeader  go to state 45
+    functionHeader   go to state 46
+
+
+State 44
+
+   32 funcProcDecl: funcProcHeader . SEMICOLON $@1 block SEMICOLON
+
+    SEMICOLON  shift, and go to state 72
+
+
+State 45
+
+   34 funcProcHeader: procedureHeader .
+
+    $default  reduce using rule 34 (funcProcHeader)
+
+
+State 46
+
+   33 funcProcHeader: functionHeader .
+
+    $default  reduce using rule 33 (funcProcHeader)
+
+
+State 47
+
+   12 constantDecl: IDENTIFIER EQ IDENTIFIER SEMICOLON .
+
+    $default  reduce using rule 12 (constantDecl)
+
+
+State 48
+
+    9 constantDecl: IDENTIFIER EQ UINT SEMICOLON .
+
+    $default  reduce using rule 9 (constantDecl)
+
+
+State 49
+
+   10 constantDecl: IDENTIFIER EQ REAL SEMICOLON .
+
+    $default  reduce using rule 10 (constantDecl)
+
+
+State 50
+
+   11 constantDecl: IDENTIFIER EQ STRING SEMICOLON .
+
+    $default  reduce using rule 11 (constantDecl)
+
+
+State 51
+
+   13 constantDecl: IDENTIFIER EQ OPER_SIGNADD UINT . SEMICOLON
+
+    SEMICOLON  shift, and go to state 73
+
+
+State 52
+
+   14 constantDecl: IDENTIFIER EQ OPER_SIGNADD REAL . SEMICOLON
+
+    SEMICOLON  shift, and go to state 74
+
+
+State 53
+
+   54 arrayType: ARRAY . LSBRA ordinalOrID ordinalOrIDs RSBRA OF type
+
+    LSBRA  shift, and go to state 75
+
+
+State 54
+
+   52 type: IDENTIFIER .  [SEMICOLON]
+  109 ordinalConstant: IDENTIFIER .  [DOTDOT]
+
+    DOTDOT    reduce using rule 109 (ordinalConstant)
+    $default  reduce using rule 52 (type)
+
+
+State 55
+
+  111 ordinalConstant: UINT .
+
+    $default  reduce using rule 111 (ordinalConstant)
+
+
+State 56
+
+  108 ordinalConstant: OPER_SIGNADD . IDENTIFIER
+  110                | OPER_SIGNADD . UINT
+
+    IDENTIFIER  shift, and go to state 76
+    UINT        shift, and go to state 77
+
+
+State 57
+
+   19 typeDecl: IDENTIFIER EQ type . SEMICOLON
+
+    SEMICOLON  shift, and go to state 78
+
+
+State 58
+
+   50 type: ordinalType .
+
+    $default  reduce using rule 50 (type)
+
+
+State 59
+
+   51 type: arrayType .
+
+    $default  reduce using rule 51 (type)
+
+
+State 60
+
+   53 ordinalType: ordinalConstant . DOTDOT ordinalConstant
+
+    DOTDOT  shift, and go to state 79
+
+
+State 61
+
+   21 typeDecls: typeDecl typeDecls .
+
+    $default  reduce using rule 21 (typeDecls)
+
+
+State 62
+
+   26 identifiers: COMMA . IDENTIFIER identifiers
+
+    IDENTIFIER  shift, and go to state 80
+
+
+State 63
+
+   24 varDecl: IDENTIFIER identifiers . COLON type SEMICOLON
+
+    COLON  shift, and go to state 81
+
+
+State 64
+
+   24 varDecl: . IDENTIFIER identifiers COLON type SEMICOLON
+   27 varDecls: . %empty  [BEGIN, PROCEDURE, FUNCTION, DOT]
+   28         | . varDecl varDecls
+   28         | varDecl . varDecls
+
+    IDENTIFIER  shift, and go to state 38
+
+    $default  reduce using rule 27 (varDecls)
+
+    varDecl   go to state 64
+    varDecls  go to state 82
+
+
+State 65
+
+   23 varBlock: VAR varDecl varDecls .
+
+    $default  reduce using rule 23 (varBlock)
+
+
+State 66
+
+   42 procedureHeader: PROCEDURE IDENTIFIER . functionParameters
+   43 functionParameters: . %empty  [SEMICOLON]
+   44                   | . LPAR formalParameters RPAR
+
+    LPAR  shift, and go to state 83
+
+    $default  reduce using rule 43 (functionParameters)
+
+    functionParameters  go to state 84
+
+
+State 67
+
+   43 functionParameters: . %empty  [COLON]
+   44                   | . LPAR formalParameters RPAR
+   45 functionHeader: FUNCTION IDENTIFIER . functionParameters COLON IDENTIFIER
+
+    LPAR  shift, and go to state 83
+
+    $default  reduce using rule 43 (functionParameters)
+
+    functionParameters  go to state 85
+
+
+State 68
+
+   38 statementsBlock: BEGIN . statement statements END
+   59 statement: . %empty  [END, SEMICOLON]
+   60          | . UINT COLON matchedStmt
+   61          | . matchedStmt
+   62          | . UINT COLON unmatchedStmt
+   63          | . unmatchedStmt
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+    UINT        shift, and go to state 93
+
+    $default  reduce using rule 59 (statement)
+
+    statement       go to state 94
+    matchedStmt     go to state 95
+    unmatchedStmt   go to state 96
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 69
+
+    2 blockP: labelBlock constBlock typeBlock varBlock functionBlock statementsBlock .
+
+    $default  reduce using rule 2 (blockP)
+
+
+State 70
+
+   32 funcProcDecl: . funcProcHeader SEMICOLON $@1 block SEMICOLON
+   33 funcProcHeader: . functionHeader
+   34               | . procedureHeader
+   35 funcProcDecls: . %empty  [BEGIN, DOT]
+   36              | . funcProcDecl funcProcDecls
+   36              | funcProcDecl . funcProcDecls
+   42 procedureHeader: . PROCEDURE IDENTIFIER functionParameters
+   45 functionHeader: . FUNCTION IDENTIFIER functionParameters COLON IDENTIFIER
+
+    PROCEDURE  shift, and go to state 40
+    FUNCTION   shift, and go to state 41
+
+    $default  reduce using rule 35 (funcProcDecls)
+
+    funcProcDecl     go to state 70
+    funcProcHeader   go to state 44
+    funcProcDecls    go to state 103
+    procedureHeader  go to state 45
+    functionHeader   go to state 46
+
+
+State 71
+
+   30 functionBlock: funcProcDecl funcProcDecls .
+
+    $default  reduce using rule 30 (functionBlock)
+
+
+State 72
+
+   31 $@1: . %empty
+   32 funcProcDecl: funcProcHeader SEMICOLON . $@1 block SEMICOLON
+
+    $default  reduce using rule 31 ($@1)
+
+    $@1  go to state 104
+
+
+State 73
+
+   13 constantDecl: IDENTIFIER EQ OPER_SIGNADD UINT SEMICOLON .
+
+    $default  reduce using rule 13 (constantDecl)
+
+
+State 74
+
+   14 constantDecl: IDENTIFIER EQ OPER_SIGNADD REAL SEMICOLON .
+
+    $default  reduce using rule 14 (constantDecl)
+
+
+State 75
+
+   53 ordinalType: . ordinalConstant DOTDOT ordinalConstant
+   54 arrayType: ARRAY LSBRA . ordinalOrID ordinalOrIDs RSBRA OF type
+   55 ordinalOrID: . IDENTIFIER
+   56            | . ordinalType
+  108 ordinalConstant: . OPER_SIGNADD IDENTIFIER
+  109                | . IDENTIFIER
+  110                | . OPER_SIGNADD UINT
+  111                | . UINT
+
+    IDENTIFIER    shift, and go to state 105
+    UINT          shift, and go to state 55
+    OPER_SIGNADD  shift, and go to state 56
+
+    ordinalType      go to state 106
+    ordinalOrID      go to state 107
+    ordinalConstant  go to state 60
+
+
+State 76
+
+  108 ordinalConstant: OPER_SIGNADD IDENTIFIER .
+
+    $default  reduce using rule 108 (ordinalConstant)
+
+
+State 77
+
+  110 ordinalConstant: OPER_SIGNADD UINT .
+
+    $default  reduce using rule 110 (ordinalConstant)
+
+
+State 78
+
+   19 typeDecl: IDENTIFIER EQ type SEMICOLON .
+
+    $default  reduce using rule 19 (typeDecl)
+
+
+State 79
+
+   53 ordinalType: ordinalConstant DOTDOT . ordinalConstant
+  108 ordinalConstant: . OPER_SIGNADD IDENTIFIER
+  109                | . IDENTIFIER
+  110                | . OPER_SIGNADD UINT
+  111                | . UINT
+
+    IDENTIFIER    shift, and go to state 108
+    UINT          shift, and go to state 55
+    OPER_SIGNADD  shift, and go to state 56
+
+    ordinalConstant  go to state 109
+
+
+State 80
+
+   25 identifiers: . %empty  [COLON]
+   26            | . COMMA IDENTIFIER identifiers
+   26            | COMMA IDENTIFIER . identifiers
+
+    COMMA  shift, and go to state 62
+
+    $default  reduce using rule 25 (identifiers)
+
+    identifiers  go to state 110
+
+
+State 81
+
+   24 varDecl: IDENTIFIER identifiers COLON . type SEMICOLON
+   50 type: . ordinalType
+   51     | . arrayType
+   52     | . IDENTIFIER
+   53 ordinalType: . ordinalConstant DOTDOT ordinalConstant
+   54 arrayType: . ARRAY LSBRA ordinalOrID ordinalOrIDs RSBRA OF type
+  108 ordinalConstant: . OPER_SIGNADD IDENTIFIER
+  109                | . IDENTIFIER
+  110                | . OPER_SIGNADD UINT
+  111                | . UINT
+
+    ARRAY         shift, and go to state 53
+    IDENTIFIER    shift, and go to state 54
+    UINT          shift, and go to state 55
+    OPER_SIGNADD  shift, and go to state 56
+
+    type             go to state 111
+    ordinalType      go to state 58
+    arrayType        go to state 59
+    ordinalConstant  go to state 60
+
+
+State 82
+
+   28 varDecls: varDecl varDecls .
+
+    $default  reduce using rule 28 (varDecls)
+
+
+State 83
+
+   44 functionParameters: LPAR . formalParameters RPAR
+   46 formalParameters: . VAR IDENTIFIER identifiers COLON IDENTIFIER formalParameterss
+   47                 | . IDENTIFIER identifiers COLON IDENTIFIER formalParameterss
+
+    VAR         shift, and go to state 112
+    IDENTIFIER  shift, and go to state 113
+
+    formalParameters  go to state 114
+
+
+State 84
+
+   42 procedureHeader: PROCEDURE IDENTIFIER functionParameters .
+
+    $default  reduce using rule 42 (procedureHeader)
+
+
+State 85
+
+   45 functionHeader: FUNCTION IDENTIFIER functionParameters . COLON IDENTIFIER
+
+    COLON  shift, and go to state 115
+
+
+State 86
+
+   59 statement: . %empty  [END, SEMICOLON]
+   60          | . UINT COLON matchedStmt
+   61          | . matchedStmt
+   62          | . UINT COLON unmatchedStmt
+   63          | . unmatchedStmt
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   67            | BEGIN . statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+    UINT        shift, and go to state 93
+
+    $default  reduce using rule 59 (statement)
+
+    statement       go to state 116
+    matchedStmt     go to state 95
+    unmatchedStmt   go to state 96
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 87
+
+   79 gotoStmt: GOTO . UINT
+
+    UINT  shift, and go to state 117
+
+
+State 88
+
+   68 matchedStmt: IF . expression THEN matchedStmt ELSE matchedStmt
+   72 unmatchedStmt: IF . expression THEN statement
+   73              | IF . expression THEN matchedStmt ELSE unmatchedStmt
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    expression        go to state 126
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 89
+
+   69 matchedStmt: WHILE . expression DO matchedStmt
+   74 unmatchedStmt: WHILE . expression DO unmatchedStmt
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    expression        go to state 131
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 90
+
+   59 statement: . %empty  [UNTIL, SEMICOLON]
+   60          | . UINT COLON matchedStmt
+   61          | . matchedStmt
+   62          | . UINT COLON unmatchedStmt
+   63          | . unmatchedStmt
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   80           | REPEAT . statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+    UINT        shift, and go to state 93
+
+    $default  reduce using rule 59 (statement)
+
+    statement       go to state 132
+    matchedStmt     go to state 95
+    unmatchedStmt   go to state 96
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 91
+
+   71 matchedStmt: FOR . IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   75 unmatchedStmt: FOR . IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+
+    IDENTIFIER  shift, and go to state 133
+
+
+State 92
+
+   77 procedureStmt: IDENTIFIER .  [END, ELSE, UNTIL, SEMICOLON]
+   78              | IDENTIFIER . LPAR realParameters RPAR
+   81 variable: IDENTIFIER .  [LSBRA, ASSIGN]
+
+    LPAR  shift, and go to state 134
+
+    LSBRA     reduce using rule 81 (variable)
+    ASSIGN    reduce using rule 81 (variable)
+    $default  reduce using rule 77 (procedureStmt)
+
+
+State 93
+
+   60 statement: UINT . COLON matchedStmt
+   62          | UINT . COLON unmatchedStmt
+
+    COLON  shift, and go to state 135
+
+
+State 94
+
+   38 statementsBlock: BEGIN statement . statements END
+   39 statements: . %empty  [END]
+   40           | . SEMICOLON statement statements
+
+    SEMICOLON  shift, and go to state 136
+
+    $default  reduce using rule 39 (statements)
+
+    statements  go to state 137
+
+
+State 95
+
+   61 statement: matchedStmt .
+
+    $default  reduce using rule 61 (statement)
+
+
+State 96
+
+   63 statement: unmatchedStmt .
+
+    $default  reduce using rule 63 (statement)
+
+
+State 97
+
+   64 matchedStmt: assignment .
+
+    $default  reduce using rule 64 (matchedStmt)
+
+
+State 98
+
+   65 matchedStmt: procedureStmt .
+
+    $default  reduce using rule 65 (matchedStmt)
+
+
+State 99
+
+   66 matchedStmt: gotoStmt .
+
+    $default  reduce using rule 66 (matchedStmt)
+
+
+State 100
+
+   70 matchedStmt: repeatStmt .
+
+    $default  reduce using rule 70 (matchedStmt)
+
+
+State 101
+
+   76 assignment: variable . ASSIGN expression
+   83 arrayReference: variable . LSBRA expression expressions RSBRA
+
+    LSBRA   shift, and go to state 138
+    ASSIGN  shift, and go to state 139
+
+
+State 102
+
+   82 variable: arrayReference .
+
+    $default  reduce using rule 82 (variable)
+
+
+State 103
+
+   36 funcProcDecls: funcProcDecl funcProcDecls .
+
+    $default  reduce using rule 36 (funcProcDecls)
+
+
+State 104
+
+    3 labelBlock: . %empty  [CONST, TYPE, VAR, BEGIN]
+    4           | . LABEL UINT uintsLabels SEMICOLON
+   32 funcProcDecl: funcProcHeader SEMICOLON $@1 . block SEMICOLON
+   41 block: . labelBlock constBlock typeBlock varBlock BEGIN statement statements END
+
+    LABEL  shift, and go to state 6
+
+    $default  reduce using rule 3 (labelBlock)
+
+    labelBlock  go to state 140
+    block       go to state 141
+
+
+State 105
+
+   55 ordinalOrID: IDENTIFIER .  [COMMA, RSBRA]
+  109 ordinalConstant: IDENTIFIER .  [DOTDOT]
+
+    DOTDOT    reduce using rule 109 (ordinalConstant)
+    $default  reduce using rule 55 (ordinalOrID)
+
+
+State 106
+
+   56 ordinalOrID: ordinalType .
+
+    $default  reduce using rule 56 (ordinalOrID)
+
+
+State 107
+
+   54 arrayType: ARRAY LSBRA ordinalOrID . ordinalOrIDs RSBRA OF type
+   57 ordinalOrIDs: . %empty  [RSBRA]
+   58             | . COMMA ordinalOrID ordinalOrIDs
+
+    COMMA  shift, and go to state 142
+
+    $default  reduce using rule 57 (ordinalOrIDs)
+
+    ordinalOrIDs  go to state 143
+
+
+State 108
+
+  109 ordinalConstant: IDENTIFIER .
+
+    $default  reduce using rule 109 (ordinalConstant)
+
+
+State 109
+
+   53 ordinalType: ordinalConstant DOTDOT ordinalConstant .
+
+    $default  reduce using rule 53 (ordinalType)
+
+
+State 110
+
+   26 identifiers: COMMA IDENTIFIER identifiers .
+
+    $default  reduce using rule 26 (identifiers)
+
+
+State 111
+
+   24 varDecl: IDENTIFIER identifiers COLON type . SEMICOLON
+
+    SEMICOLON  shift, and go to state 144
+
+
+State 112
+
+   46 formalParameters: VAR . IDENTIFIER identifiers COLON IDENTIFIER formalParameterss
+
+    IDENTIFIER  shift, and go to state 145
+
+
+State 113
+
+   25 identifiers: . %empty  [COLON]
+   26            | . COMMA IDENTIFIER identifiers
+   47 formalParameters: IDENTIFIER . identifiers COLON IDENTIFIER formalParameterss
+
+    COMMA  shift, and go to state 62
+
+    $default  reduce using rule 25 (identifiers)
+
+    identifiers  go to state 146
+
+
+State 114
+
+   44 functionParameters: LPAR formalParameters . RPAR
+
+    RPAR  shift, and go to state 147
+
+
+State 115
+
+   45 functionHeader: FUNCTION IDENTIFIER functionParameters COLON . IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 148
+
+
+State 116
+
+   39 statements: . %empty  [END]
+   40           | . SEMICOLON statement statements
+   67 matchedStmt: BEGIN statement . statements END
+
+    SEMICOLON  shift, and go to state 136
+
+    $default  reduce using rule 39 (statements)
+
+    statements  go to state 149
+
+
+State 117
+
+   79 gotoStmt: GOTO UINT .
+
+    $default  reduce using rule 79 (gotoStmt)
+
+
+State 118
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  102       | NOT . factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT         shift, and go to state 118
+    IDENTIFIER  shift, and go to state 119
+    UINT        shift, and go to state 120
+    REAL        shift, and go to state 121
+    STRING      shift, and go to state 122
+    LPAR        shift, and go to state 123
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    factor            go to state 150
+    unsignedConstant  go to state 130
+
+
+State 119
+
+   81 variable: IDENTIFIER .  [END, THEN, ELSE, DO, UNTIL, OR, SEMICOLON, COMMA, EQ, RPAR, LSBRA, RSBRA, OPER_REL, OPER_SIGNADD, OPER_MUL, FOR_DIRECTION]
+  100 factor: IDENTIFIER . LPAR realParameters RPAR
+
+    LPAR  shift, and go to state 151
+
+    $default  reduce using rule 81 (variable)
+
+
+State 120
+
+  105 unsignedConstant: UINT .
+
+    $default  reduce using rule 105 (unsignedConstant)
+
+
+State 121
+
+  106 unsignedConstant: REAL .
+
+    $default  reduce using rule 106 (unsignedConstant)
+
+
+State 122
+
+  107 unsignedConstant: STRING .
+
+    $default  reduce using rule 107 (unsignedConstant)
+
+
+State 123
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  101       | LPAR . expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    expression        go to state 152
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 124
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   92 simpleExpression: OPER_SIGNADD . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT         shift, and go to state 118
+    IDENTIFIER  shift, and go to state 119
+    UINT        shift, and go to state 120
+    REAL        shift, and go to state 121
+    STRING      shift, and go to state 122
+    LPAR        shift, and go to state 123
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    term              go to state 153
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 125
+
+   83 arrayReference: variable . LSBRA expression expressions RSBRA
+   99 factor: variable .  [END, THEN, ELSE, DO, UNTIL, OR, SEMICOLON, COMMA, EQ, RPAR, RSBRA, OPER_REL, OPER_SIGNADD, OPER_MUL, FOR_DIRECTION]
+
+    LSBRA  shift, and go to state 138
+
+    $default  reduce using rule 99 (factor)
+
+
+State 126
+
+   68 matchedStmt: IF expression . THEN matchedStmt ELSE matchedStmt
+   72 unmatchedStmt: IF expression . THEN statement
+   73              | IF expression . THEN matchedStmt ELSE unmatchedStmt
+
+    THEN  shift, and go to state 154
+
+
+State 127
+
+   88 expression: simpleExpression . relationalExpression
+   89 relationalExpression: . %empty  [END, THEN, ELSE, DO, UNTIL, SEMICOLON, COMMA, RPAR, RSBRA, FOR_DIRECTION]
+   90                     | . OPER_REL simpleExpression
+   91                     | . EQ simpleExpression
+
+    EQ        shift, and go to state 155
+    OPER_REL  shift, and go to state 156
+
+    $default  reduce using rule 89 (relationalExpression)
+
+    relationalExpression  go to state 157
+
+
+State 128
+
+   93 simpleExpression: term . terms
+   95 terms: . %empty  [END, THEN, ELSE, DO, UNTIL, SEMICOLON, COMMA, EQ, RPAR, RSBRA, OPER_REL, FOR_DIRECTION]
+   96      | . OPER_SIGNADD term terms
+   97      | . OR term terms
+
+    OR            shift, and go to state 158
+    OPER_SIGNADD  shift, and go to state 159
+
+    $default  reduce using rule 95 (terms)
+
+    terms  go to state 160
+
+
+State 129
+
+   94 term: factor . factors
+  103 factors: . %empty  [END, THEN, ELSE, DO, UNTIL, OR, SEMICOLON, COMMA, EQ, RPAR, RSBRA, OPER_REL, OPER_SIGNADD, FOR_DIRECTION]
+  104        | . OPER_MUL factor
+
+    OPER_MUL  shift, and go to state 161
+
+    $default  reduce using rule 103 (factors)
+
+    factors  go to state 162
+
+
+State 130
+
+   98 factor: unsignedConstant .
+
+    $default  reduce using rule 98 (factor)
+
+
+State 131
+
+   69 matchedStmt: WHILE expression . DO matchedStmt
+   74 unmatchedStmt: WHILE expression . DO unmatchedStmt
+
+    DO  shift, and go to state 163
+
+
+State 132
+
+   39 statements: . %empty  [UNTIL]
+   40           | . SEMICOLON statement statements
+   80 repeatStmt: REPEAT statement . statements UNTIL expression
+
+    SEMICOLON  shift, and go to state 136
+
+    $default  reduce using rule 39 (statements)
+
+    statements  go to state 164
+
+
+State 133
+
+   71 matchedStmt: FOR IDENTIFIER . ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   75 unmatchedStmt: FOR IDENTIFIER . ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+
+    ASSIGN  shift, and go to state 165
+
+
+State 134
+
+   78 procedureStmt: IDENTIFIER LPAR . realParameters RPAR
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   86 realParameters: . expression
+   87               | . expression COMMA realParameters
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    realParameters    go to state 166
+    expression        go to state 167
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 135
+
+   60 statement: UINT COLON . matchedStmt
+   62          | UINT COLON . unmatchedStmt
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+
+    matchedStmt     go to state 168
+    unmatchedStmt   go to state 169
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 136
+
+   40 statements: SEMICOLON . statement statements
+   59 statement: . %empty  [END, UNTIL, SEMICOLON]
+   60          | . UINT COLON matchedStmt
+   61          | . matchedStmt
+   62          | . UINT COLON unmatchedStmt
+   63          | . unmatchedStmt
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+    UINT        shift, and go to state 93
+
+    $default  reduce using rule 59 (statement)
+
+    statement       go to state 170
+    matchedStmt     go to state 95
+    unmatchedStmt   go to state 96
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 137
+
+   38 statementsBlock: BEGIN statement statements . END
+
+    END  shift, and go to state 171
+
+
+State 138
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   83               | variable LSBRA . expression expressions RSBRA
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    expression        go to state 172
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 139
+
+   76 assignment: variable ASSIGN . expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    expression        go to state 173
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 140
+
+    7 constBlock: . %empty  [TYPE, VAR, BEGIN]
+    8           | . CONST constantDecl constantDecls
+   41 block: labelBlock . constBlock typeBlock varBlock BEGIN statement statements END
+
+    CONST  shift, and go to state 11
+
+    $default  reduce using rule 7 (constBlock)
+
+    constBlock  go to state 174
+
+
+State 141
+
+   32 funcProcDecl: funcProcHeader SEMICOLON $@1 block . SEMICOLON
+
+    SEMICOLON  shift, and go to state 175
+
+
+State 142
+
+   53 ordinalType: . ordinalConstant DOTDOT ordinalConstant
+   55 ordinalOrID: . IDENTIFIER
+   56            | . ordinalType
+   58 ordinalOrIDs: COMMA . ordinalOrID ordinalOrIDs
+  108 ordinalConstant: . OPER_SIGNADD IDENTIFIER
+  109                | . IDENTIFIER
+  110                | . OPER_SIGNADD UINT
+  111                | . UINT
+
+    IDENTIFIER    shift, and go to state 105
+    UINT          shift, and go to state 55
+    OPER_SIGNADD  shift, and go to state 56
+
+    ordinalType      go to state 106
+    ordinalOrID      go to state 176
+    ordinalConstant  go to state 60
+
+
+State 143
+
+   54 arrayType: ARRAY LSBRA ordinalOrID ordinalOrIDs . RSBRA OF type
+
+    RSBRA  shift, and go to state 177
+
+
+State 144
+
+   24 varDecl: IDENTIFIER identifiers COLON type SEMICOLON .
+
+    $default  reduce using rule 24 (varDecl)
+
+
+State 145
+
+   25 identifiers: . %empty  [COLON]
+   26            | . COMMA IDENTIFIER identifiers
+   46 formalParameters: VAR IDENTIFIER . identifiers COLON IDENTIFIER formalParameterss
+
+    COMMA  shift, and go to state 62
+
+    $default  reduce using rule 25 (identifiers)
+
+    identifiers  go to state 178
+
+
+State 146
+
+   47 formalParameters: IDENTIFIER identifiers . COLON IDENTIFIER formalParameterss
+
+    COLON  shift, and go to state 179
+
+
+State 147
+
+   44 functionParameters: LPAR formalParameters RPAR .
+
+    $default  reduce using rule 44 (functionParameters)
+
+
+State 148
+
+   45 functionHeader: FUNCTION IDENTIFIER functionParameters COLON IDENTIFIER .
+
+    $default  reduce using rule 45 (functionHeader)
+
+
+State 149
+
+   67 matchedStmt: BEGIN statement statements . END
+
+    END  shift, and go to state 180
+
+
+State 150
+
+  102 factor: NOT factor .
+
+    $default  reduce using rule 102 (factor)
+
+
+State 151
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   86 realParameters: . expression
+   87               | . expression COMMA realParameters
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  100       | IDENTIFIER LPAR . realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    realParameters    go to state 181
+    expression        go to state 167
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 152
+
+  101 factor: LPAR expression . RPAR
+
+    RPAR  shift, and go to state 182
+
+
+State 153
+
+   92 simpleExpression: OPER_SIGNADD term . terms
+   95 terms: . %empty  [END, THEN, ELSE, DO, UNTIL, SEMICOLON, COMMA, EQ, RPAR, RSBRA, OPER_REL, FOR_DIRECTION]
+   96      | . OPER_SIGNADD term terms
+   97      | . OR term terms
+
+    OR            shift, and go to state 158
+    OPER_SIGNADD  shift, and go to state 159
+
+    $default  reduce using rule 95 (terms)
+
+    terms  go to state 183
+
+
+State 154
+
+   59 statement: . %empty  [END, UNTIL, SEMICOLON]
+   60          | . UINT COLON matchedStmt
+   61          | . matchedStmt
+   62          | . UINT COLON unmatchedStmt
+   63          | . unmatchedStmt
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   68            | IF expression THEN . matchedStmt ELSE matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   72              | IF expression THEN . statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   73              | IF expression THEN . matchedStmt ELSE unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+    UINT        shift, and go to state 93
+
+    $default  reduce using rule 59 (statement)
+
+    statement       go to state 184
+    matchedStmt     go to state 185
+    unmatchedStmt   go to state 96
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 155
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   91 relationalExpression: EQ . simpleExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    simpleExpression  go to state 186
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 156
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   90 relationalExpression: OPER_REL . simpleExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    simpleExpression  go to state 187
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 157
+
+   88 expression: simpleExpression relationalExpression .
+
+    $default  reduce using rule 88 (expression)
+
+
+State 158
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   94 term: . factor factors
+   97 terms: OR . term terms
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT         shift, and go to state 118
+    IDENTIFIER  shift, and go to state 119
+    UINT        shift, and go to state 120
+    REAL        shift, and go to state 121
+    STRING      shift, and go to state 122
+    LPAR        shift, and go to state 123
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    term              go to state 188
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 159
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   94 term: . factor factors
+   96 terms: OPER_SIGNADD . term terms
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT         shift, and go to state 118
+    IDENTIFIER  shift, and go to state 119
+    UINT        shift, and go to state 120
+    REAL        shift, and go to state 121
+    STRING      shift, and go to state 122
+    LPAR        shift, and go to state 123
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    term              go to state 189
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 160
+
+   93 simpleExpression: term terms .
+
+    $default  reduce using rule 93 (simpleExpression)
+
+
+State 161
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  104 factors: OPER_MUL . factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT         shift, and go to state 118
+    IDENTIFIER  shift, and go to state 119
+    UINT        shift, and go to state 120
+    REAL        shift, and go to state 121
+    STRING      shift, and go to state 122
+    LPAR        shift, and go to state 123
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    factor            go to state 190
+    unsignedConstant  go to state 130
+
+
+State 162
+
+   94 term: factor factors .
+
+    $default  reduce using rule 94 (term)
+
+
+State 163
+
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   69            | WHILE expression DO . matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   74              | WHILE expression DO . unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+
+    matchedStmt     go to state 191
+    unmatchedStmt   go to state 192
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 164
+
+   80 repeatStmt: REPEAT statement statements . UNTIL expression
+
+    UNTIL  shift, and go to state 193
+
+
+State 165
+
+   71 matchedStmt: FOR IDENTIFIER ASSIGN . expression FOR_DIRECTION expression DO matchedStmt
+   75 unmatchedStmt: FOR IDENTIFIER ASSIGN . expression FOR_DIRECTION expression DO unmatchedStmt
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    expression        go to state 194
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 166
+
+   78 procedureStmt: IDENTIFIER LPAR realParameters . RPAR
+
+    RPAR  shift, and go to state 195
+
+
+State 167
+
+   86 realParameters: expression .  [RPAR]
+   87               | expression . COMMA realParameters
+
+    COMMA  shift, and go to state 196
+
+    $default  reduce using rule 86 (realParameters)
+
+
+State 168
+
+   60 statement: UINT COLON matchedStmt .
+
+    $default  reduce using rule 60 (statement)
+
+
+State 169
+
+   62 statement: UINT COLON unmatchedStmt .
+
+    $default  reduce using rule 62 (statement)
+
+
+State 170
+
+   39 statements: . %empty  [END, UNTIL]
+   40           | . SEMICOLON statement statements
+   40           | SEMICOLON statement . statements
+
+    SEMICOLON  shift, and go to state 136
+
+    $default  reduce using rule 39 (statements)
+
+    statements  go to state 197
+
+
+State 171
+
+   38 statementsBlock: BEGIN statement statements END .
+
+    $default  reduce using rule 38 (statementsBlock)
+
+
+State 172
+
+   83 arrayReference: variable LSBRA expression . expressions RSBRA
+   84 expressions: . %empty  [RSBRA]
+   85            | . COMMA expression expressions
+
+    COMMA  shift, and go to state 198
+
+    $default  reduce using rule 84 (expressions)
+
+    expressions  go to state 199
+
+
+State 173
+
+   76 assignment: variable ASSIGN expression .
+
+    $default  reduce using rule 76 (assignment)
+
+
+State 174
+
+   17 typeBlock: . %empty  [VAR, BEGIN]
+   18          | . TYPE typeDecl typeDecls
+   41 block: labelBlock constBlock . typeBlock varBlock BEGIN statement statements END
+
+    TYPE  shift, and go to state 17
+
+    $default  reduce using rule 17 (typeBlock)
+
+    typeBlock  go to state 200
+
+
+State 175
+
+   32 funcProcDecl: funcProcHeader SEMICOLON $@1 block SEMICOLON .
+
+    $default  reduce using rule 32 (funcProcDecl)
+
+
+State 176
+
+   57 ordinalOrIDs: . %empty  [RSBRA]
+   58             | . COMMA ordinalOrID ordinalOrIDs
+   58             | COMMA ordinalOrID . ordinalOrIDs
+
+    COMMA  shift, and go to state 142
+
+    $default  reduce using rule 57 (ordinalOrIDs)
+
+    ordinalOrIDs  go to state 201
+
+
+State 177
+
+   54 arrayType: ARRAY LSBRA ordinalOrID ordinalOrIDs RSBRA . OF type
+
+    OF  shift, and go to state 202
+
+
+State 178
+
+   46 formalParameters: VAR IDENTIFIER identifiers . COLON IDENTIFIER formalParameterss
+
+    COLON  shift, and go to state 203
+
+
+State 179
+
+   47 formalParameters: IDENTIFIER identifiers COLON . IDENTIFIER formalParameterss
+
+    IDENTIFIER  shift, and go to state 204
+
+
+State 180
+
+   67 matchedStmt: BEGIN statement statements END .
+
+    $default  reduce using rule 67 (matchedStmt)
+
+
+State 181
+
+  100 factor: IDENTIFIER LPAR realParameters . RPAR
+
+    RPAR  shift, and go to state 205
+
+
+State 182
+
+  101 factor: LPAR expression RPAR .
+
+    $default  reduce using rule 101 (factor)
+
+
+State 183
+
+   92 simpleExpression: OPER_SIGNADD term terms .
+
+    $default  reduce using rule 92 (simpleExpression)
+
+
+State 184
+
+   72 unmatchedStmt: IF expression THEN statement .
+
+    $default  reduce using rule 72 (unmatchedStmt)
+
+
+State 185
+
+   61 statement: matchedStmt .  [END, UNTIL, SEMICOLON]
+   68 matchedStmt: IF expression THEN matchedStmt . ELSE matchedStmt
+   73 unmatchedStmt: IF expression THEN matchedStmt . ELSE unmatchedStmt
+
+    ELSE  shift, and go to state 206
+
+    $default  reduce using rule 61 (statement)
+
+
+State 186
+
+   91 relationalExpression: EQ simpleExpression .
+
+    $default  reduce using rule 91 (relationalExpression)
+
+
+State 187
+
+   90 relationalExpression: OPER_REL simpleExpression .
+
+    $default  reduce using rule 90 (relationalExpression)
+
+
+State 188
+
+   95 terms: . %empty  [END, THEN, ELSE, DO, UNTIL, SEMICOLON, COMMA, EQ, RPAR, RSBRA, OPER_REL, FOR_DIRECTION]
+   96      | . OPER_SIGNADD term terms
+   97      | . OR term terms
+   97      | OR term . terms
+
+    OR            shift, and go to state 158
+    OPER_SIGNADD  shift, and go to state 159
+
+    $default  reduce using rule 95 (terms)
+
+    terms  go to state 207
+
+
+State 189
+
+   95 terms: . %empty  [END, THEN, ELSE, DO, UNTIL, SEMICOLON, COMMA, EQ, RPAR, RSBRA, OPER_REL, FOR_DIRECTION]
+   96      | . OPER_SIGNADD term terms
+   96      | OPER_SIGNADD term . terms
+   97      | . OR term terms
+
+    OR            shift, and go to state 158
+    OPER_SIGNADD  shift, and go to state 159
+
+    $default  reduce using rule 95 (terms)
+
+    terms  go to state 208
+
+
+State 190
+
+  104 factors: OPER_MUL factor .
+
+    $default  reduce using rule 104 (factors)
+
+
+State 191
+
+   69 matchedStmt: WHILE expression DO matchedStmt .
+
+    $default  reduce using rule 69 (matchedStmt)
+
+
+State 192
+
+   74 unmatchedStmt: WHILE expression DO unmatchedStmt .
+
+    $default  reduce using rule 74 (unmatchedStmt)
+
+
+State 193
+
+   80 repeatStmt: REPEAT statement statements UNTIL . expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    expression        go to state 209
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 194
+
+   71 matchedStmt: FOR IDENTIFIER ASSIGN expression . FOR_DIRECTION expression DO matchedStmt
+   75 unmatchedStmt: FOR IDENTIFIER ASSIGN expression . FOR_DIRECTION expression DO unmatchedStmt
+
+    FOR_DIRECTION  shift, and go to state 210
+
+
+State 195
+
+   78 procedureStmt: IDENTIFIER LPAR realParameters RPAR .
+
+    $default  reduce using rule 78 (procedureStmt)
+
+
+State 196
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   86 realParameters: . expression
+   87               | . expression COMMA realParameters
+   87               | expression COMMA . realParameters
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    realParameters    go to state 211
+    expression        go to state 167
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 197
+
+   40 statements: SEMICOLON statement statements .
+
+    $default  reduce using rule 40 (statements)
+
+
+State 198
+
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   85 expressions: COMMA . expression expressions
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    expression        go to state 212
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 199
+
+   83 arrayReference: variable LSBRA expression expressions . RSBRA
+
+    RSBRA  shift, and go to state 213
+
+
+State 200
+
+   22 varBlock: . %empty  [BEGIN]
+   23         | . VAR varDecl varDecls
+   41 block: labelBlock constBlock typeBlock . varBlock BEGIN statement statements END
+
+    VAR  shift, and go to state 26
+
+    $default  reduce using rule 22 (varBlock)
+
+    varBlock  go to state 214
+
+
+State 201
+
+   58 ordinalOrIDs: COMMA ordinalOrID ordinalOrIDs .
+
+    $default  reduce using rule 58 (ordinalOrIDs)
+
+
+State 202
+
+   50 type: . ordinalType
+   51     | . arrayType
+   52     | . IDENTIFIER
+   53 ordinalType: . ordinalConstant DOTDOT ordinalConstant
+   54 arrayType: . ARRAY LSBRA ordinalOrID ordinalOrIDs RSBRA OF type
+   54          | ARRAY LSBRA ordinalOrID ordinalOrIDs RSBRA OF . type
+  108 ordinalConstant: . OPER_SIGNADD IDENTIFIER
+  109                | . IDENTIFIER
+  110                | . OPER_SIGNADD UINT
+  111                | . UINT
+
+    ARRAY         shift, and go to state 53
+    IDENTIFIER    shift, and go to state 54
+    UINT          shift, and go to state 55
+    OPER_SIGNADD  shift, and go to state 56
+
+    type             go to state 215
+    ordinalType      go to state 58
+    arrayType        go to state 59
+    ordinalConstant  go to state 60
+
+
+State 203
+
+   46 formalParameters: VAR IDENTIFIER identifiers COLON . IDENTIFIER formalParameterss
+
+    IDENTIFIER  shift, and go to state 216
+
+
+State 204
+
+   47 formalParameters: IDENTIFIER identifiers COLON IDENTIFIER . formalParameterss
+   48 formalParameterss: . %empty  [RPAR]
+   49                  | . SEMICOLON formalParameters
+
+    SEMICOLON  shift, and go to state 217
+
+    $default  reduce using rule 48 (formalParameterss)
+
+    formalParameterss  go to state 218
+
+
+State 205
+
+  100 factor: IDENTIFIER LPAR realParameters RPAR .
+
+    $default  reduce using rule 100 (factor)
+
+
+State 206
+
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   68            | IF expression THEN matchedStmt ELSE . matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   73              | IF expression THEN matchedStmt ELSE . unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+
+    matchedStmt     go to state 219
+    unmatchedStmt   go to state 220
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 207
+
+   97 terms: OR term terms .
+
+    $default  reduce using rule 97 (terms)
+
+
+State 208
+
+   96 terms: OPER_SIGNADD term terms .
+
+    $default  reduce using rule 96 (terms)
+
+
+State 209
+
+   80 repeatStmt: REPEAT statement statements UNTIL expression .
+
+    $default  reduce using rule 80 (repeatStmt)
+
+
+State 210
+
+   71 matchedStmt: FOR IDENTIFIER ASSIGN expression FOR_DIRECTION . expression DO matchedStmt
+   75 unmatchedStmt: FOR IDENTIFIER ASSIGN expression FOR_DIRECTION . expression DO unmatchedStmt
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+   88 expression: . simpleExpression relationalExpression
+   92 simpleExpression: . OPER_SIGNADD term terms
+   93                 | . term terms
+   94 term: . factor factors
+   98 factor: . unsignedConstant
+   99       | . variable
+  100       | . IDENTIFIER LPAR realParameters RPAR
+  101       | . LPAR expression RPAR
+  102       | . NOT factor
+  105 unsignedConstant: . UINT
+  106                 | . REAL
+  107                 | . STRING
+
+    NOT           shift, and go to state 118
+    IDENTIFIER    shift, and go to state 119
+    UINT          shift, and go to state 120
+    REAL          shift, and go to state 121
+    STRING        shift, and go to state 122
+    LPAR          shift, and go to state 123
+    OPER_SIGNADD  shift, and go to state 124
+
+    variable          go to state 125
+    arrayReference    go to state 102
+    expression        go to state 221
+    simpleExpression  go to state 127
+    term              go to state 128
+    factor            go to state 129
+    unsignedConstant  go to state 130
+
+
+State 211
+
+   87 realParameters: expression COMMA realParameters .
+
+    $default  reduce using rule 87 (realParameters)
+
+
+State 212
+
+   84 expressions: . %empty  [RSBRA]
+   85            | . COMMA expression expressions
+   85            | COMMA expression . expressions
+
+    COMMA  shift, and go to state 198
+
+    $default  reduce using rule 84 (expressions)
+
+    expressions  go to state 222
+
+
+State 213
+
+   83 arrayReference: variable LSBRA expression expressions RSBRA .
+
+    $default  reduce using rule 83 (arrayReference)
+
+
+State 214
+
+   41 block: labelBlock constBlock typeBlock varBlock . BEGIN statement statements END
+
+    BEGIN  shift, and go to state 223
+
+
+State 215
+
+   54 arrayType: ARRAY LSBRA ordinalOrID ordinalOrIDs RSBRA OF type .
+
+    $default  reduce using rule 54 (arrayType)
+
+
+State 216
+
+   46 formalParameters: VAR IDENTIFIER identifiers COLON IDENTIFIER . formalParameterss
+   48 formalParameterss: . %empty  [RPAR]
+   49                  | . SEMICOLON formalParameters
+
+    SEMICOLON  shift, and go to state 217
+
+    $default  reduce using rule 48 (formalParameterss)
+
+    formalParameterss  go to state 224
+
+
+State 217
+
+   46 formalParameters: . VAR IDENTIFIER identifiers COLON IDENTIFIER formalParameterss
+   47                 | . IDENTIFIER identifiers COLON IDENTIFIER formalParameterss
+   49 formalParameterss: SEMICOLON . formalParameters
+
+    VAR         shift, and go to state 112
+    IDENTIFIER  shift, and go to state 113
+
+    formalParameters  go to state 225
+
+
+State 218
+
+   47 formalParameters: IDENTIFIER identifiers COLON IDENTIFIER formalParameterss .
+
+    $default  reduce using rule 47 (formalParameters)
+
+
+State 219
+
+   68 matchedStmt: IF expression THEN matchedStmt ELSE matchedStmt .
+
+    $default  reduce using rule 68 (matchedStmt)
+
+
+State 220
+
+   73 unmatchedStmt: IF expression THEN matchedStmt ELSE unmatchedStmt .
+
+    $default  reduce using rule 73 (unmatchedStmt)
+
+
+State 221
+
+   71 matchedStmt: FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression . DO matchedStmt
+   75 unmatchedStmt: FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression . DO unmatchedStmt
+
+    DO  shift, and go to state 226
+
+
+State 222
+
+   85 expressions: COMMA expression expressions .
+
+    $default  reduce using rule 85 (expressions)
+
+
+State 223
+
+   41 block: labelBlock constBlock typeBlock varBlock BEGIN . statement statements END
+   59 statement: . %empty  [END, SEMICOLON]
+   60          | . UINT COLON matchedStmt
+   61          | . matchedStmt
+   62          | . UINT COLON unmatchedStmt
+   63          | . unmatchedStmt
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+    UINT        shift, and go to state 93
+
+    $default  reduce using rule 59 (statement)
+
+    statement       go to state 227
+    matchedStmt     go to state 95
+    unmatchedStmt   go to state 96
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 224
+
+   46 formalParameters: VAR IDENTIFIER identifiers COLON IDENTIFIER formalParameterss .
+
+    $default  reduce using rule 46 (formalParameters)
+
+
+State 225
+
+   49 formalParameterss: SEMICOLON formalParameters .
+
+    $default  reduce using rule 49 (formalParameterss)
+
+
+State 226
+
+   64 matchedStmt: . assignment
+   65            | . procedureStmt
+   66            | . gotoStmt
+   67            | . BEGIN statement statements END
+   68            | . IF expression THEN matchedStmt ELSE matchedStmt
+   69            | . WHILE expression DO matchedStmt
+   70            | . repeatStmt
+   71            | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt
+   71            | FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO . matchedStmt
+   72 unmatchedStmt: . IF expression THEN statement
+   73              | . IF expression THEN matchedStmt ELSE unmatchedStmt
+   74              | . WHILE expression DO unmatchedStmt
+   75              | . FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt
+   75              | FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO . unmatchedStmt
+   76 assignment: . variable ASSIGN expression
+   77 procedureStmt: . IDENTIFIER
+   78              | . IDENTIFIER LPAR realParameters RPAR
+   79 gotoStmt: . GOTO UINT
+   80 repeatStmt: . REPEAT statement statements UNTIL expression
+   81 variable: . IDENTIFIER
+   82         | . arrayReference
+   83 arrayReference: . variable LSBRA expression expressions RSBRA
+
+    BEGIN       shift, and go to state 86
+    GOTO        shift, and go to state 87
+    IF          shift, and go to state 88
+    WHILE       shift, and go to state 89
+    REPEAT      shift, and go to state 90
+    FOR         shift, and go to state 91
+    IDENTIFIER  shift, and go to state 92
+
+    matchedStmt     go to state 228
+    unmatchedStmt   go to state 229
+    assignment      go to state 97
+    procedureStmt   go to state 98
+    gotoStmt        go to state 99
+    repeatStmt      go to state 100
+    variable        go to state 101
+    arrayReference  go to state 102
+
+
+State 227
+
+   39 statements: . %empty  [END]
+   40           | . SEMICOLON statement statements
+   41 block: labelBlock constBlock typeBlock varBlock BEGIN statement . statements END
+
+    SEMICOLON  shift, and go to state 136
+
+    $default  reduce using rule 39 (statements)
+
+    statements  go to state 230
+
+
+State 228
+
+   71 matchedStmt: FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO matchedStmt .
+
+    $default  reduce using rule 71 (matchedStmt)
+
+
+State 229
+
+   75 unmatchedStmt: FOR IDENTIFIER ASSIGN expression FOR_DIRECTION expression DO unmatchedStmt .
+
+    $default  reduce using rule 75 (unmatchedStmt)
+
+
+State 230
+
+   41 block: labelBlock constBlock typeBlock varBlock BEGIN statement statements . END
+
+    END  shift, and go to state 231
+
+
+State 231
+
+   41 block: labelBlock constBlock typeBlock varBlock BEGIN statement statements END .
+
+    $default  reduce using rule 41 (block)

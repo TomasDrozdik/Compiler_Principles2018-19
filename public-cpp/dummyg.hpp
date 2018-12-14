@@ -616,7 +616,7 @@ namespace yy {
     symbol_type
     make_OR (const location_type& l);
 
-    static inline
+    static 
     symbol_type
     make_NOT (const location_type& l);
 
